@@ -23,15 +23,17 @@
 ###### It gives more importance to data rather than procedure.
 ##### 9) JVM architecture?
 ![JVM architecture](https://github.com/user-attachments/assets/c6313ad9-4a9e-4d40-ab6d-672de3831c0e)
-###### Java compiler converts the .java file to the .class file.
-###### The JVM first loads this .class file into the class loader sub-system.
-###### Run time Memory area: The program is allocated memory for different data
-###### The Method area: is used to store the code of the program that is currently in execution.
-###### Heap: is used to store objects created in the program during run time.
-###### Stack: is used to store data when calling methods.
-###### PC (Program Counter) Register: contains the address of the code of the program that is in execution.
-###### Native method stack: store the native method memory.
-###### Execution Engine of the JVM is a special block with an interpreter and JIT.
+```
+#Java compiler converts the .java file to the .class file.
+#The JVM first loads this .class file into the class loader sub-system.
+#Run time Memory area: The program is allocated memory for different data
+#The Method area: is used to store the code of the program that is currently in execution.
+#Heap: is used to store objects created in the program during run time.
+#Stack: is used to store data when calling methods.
+#PC (Program Counter) Register: contains the address of the code of the program that is in execution.
+#Native method stack: store the native method memory.
+#Execution Engine of the JVM is a special block with an interpreter and JIT.
+```
 ##### 10) What is a classloader?
 ###### Class loader is a subsystem of the JVM that is used to load the .class file.
 ###### There are 3 types of classloaders in Java.
