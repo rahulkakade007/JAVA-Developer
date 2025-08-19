@@ -1,4 +1,4 @@
-## JDBC
+### JDBC
 ##### 1)What is JDBC?
 ###### JDBC helps our applications to communicate with the DB.
 ###### It allows a Java program to access a DB, run queries, retrieve, and manipulate the data.
@@ -76,7 +76,7 @@ ResultSet rs = st.executeQuery("select * from students");
 ###### This driver directly interacts with the DB.
 ###### It does not require any native DB library.
 
-##### Types of Statement in JDBC
+##### 5) Types of Statements in JDBC
 ###### i. Statement: It is used for general-purpose access to DB and is useful for executing static SQL statements at runtime.
 `````
 Statement statement = connection.createStatement();
@@ -127,3 +127,12 @@ Statement statement = connection.createStatement();
         System.out.println("Age : " + res.getInt("age"));
             }
 `````
+##### 6) Connection pooling in JDBC?
+###### Connection pooling is a technique used to maintain a pool of reusable database connections, which can be shared among multiple clients. This approach significantly improves performance by reducing the overhead of establishing new connections and efficiently managing resources.
+##### 7) Explain how to use transactions in JDBC?
+###### To use transactions in JDBC, you first disable the auto-commit mode using connection.setAutoCommit(false). Then, you can execute multiple statements and commit the transaction using connection.commit() or rollback using connection.rollback() if an error occurs.
+##### 8) Explain the difference between a ResultSet and a ResultSetMetaData?
+###### A ResultSet is an object that holds data retrieved from a database query, allowing you to iterate through the results. 
+###### ResultSetMetaData provides information about the types and properties of the columns in a ResultSet, such as column names and data types.
+#
+### Servlet
