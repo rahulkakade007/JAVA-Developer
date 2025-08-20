@@ -136,3 +136,43 @@ Statement statement = connection.createStatement();
 ###### ResultSetMetaData provides information about the types and properties of the columns in a ResultSet, such as column names and data types.
 #
 ### Servlet
+##### 1) What is a servlet?
+###### Servlet is a Java class that helps us build dynamic web applications.
+##### 2) What is a dynamic web application?
+###### A dynamic web application refers to a website or web-based software that generates content and functionality in real-time based on user input, server-side processing, and data retrieved from a database.
+##### 3) States of the Servlet Life Cycle?
+<img width="300" height="300" alt="State of servlet life cycle" src="https://github.com/user-attachments/assets/2dd8b30b-45a5-4e96-b238-09955e99cc7e" />
+
+`````
+1. Loading a Servlet
+The first stage of the Servlet lifecycle involves loading and initializing the Servlet. The Servlet container performs the following operations:
+Loading: The Servlet container loads the Servlet class into memory.
+Instantiation: The container creates an instance of the Servlet using the no-argument constructor.
+
+2. Initializing a Servlet
+After the Servlet is instantiated, the Servlet container initializes it by calling the init(ServletConfig config) method. This method is called only once during the Servlet's life cycle.
+
+3. Handling request
+Once the Servlet is initialized, it is ready to handle client requests. The Servlet container performs the following steps for each request:
+Create Request and Response Objects
+The container creates ServletRequest and ServletResponse objects.
+For HTTP requests, it creates HttpServletRequest and HttpServletResponse objects.
+
+Invoke the service() Method
+The container calls the service(ServletRequest req, ServletResponse res) method.
+The service() method determines the type of HTTP request (GET, POST, PUT, DELETE, etc.) and delegates the request to the appropriate method (doGet(), doPost(), etc).
+
+4. Destroying a Servlet
+When the Servlet container decides to remove the Servlet.
+`````
+##### 4) Servlet Life Cycle Methods?
+`````
+> For the first time, when the request hits the server, Tomcat will load the servlet in the catalina/tomcat container.
+> The first method to be executed is init(). It will create a request and response object.
+> Then, the request will be sent to the service(). It will get executed depending on the kind of request (doGet()/doPost()).
+> For the subsequent request init() will get skip and request goto service() directly.
+> The object created by init() will be reused for subsequent requests. So, the performance of the servlet is good.
+> Finally, once destroy() is executed, the servlet's life cycle ends.
+`````
+
+##### 5) 
