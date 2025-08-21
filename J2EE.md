@@ -175,4 +175,489 @@ When the Servlet container decides to remove the Servlet.
 > Finally, once destroy() is executed, the servlet's life cycle ends.
 `````
 
-##### 5) 
+##### 5) Way to create a servlet?
+###### i. Extending GenericServlet
+`````
+import java.io.*;
+import javax.servlet.*;
+
+public class MyFirstServlet extends GenericServlet
+
+{
+    public void service(ServletRequest req, ServletResponse resp) throws ServletException, IOException
+    {
+        resp.setContentType("text/html");
+        PrintWriter pw = resp.getWriter();
+        pw.println("<html>");
+        pw.println("<head><title>My first Servlet</title></head>");
+        pw.println("<body>");
+        pw.println("<h2>Welcome To Servlet World!</h2>");
+        pw.println("</body>");
+        pw.println("</html>");
+        pw.close();
+    }
+}
+`````
+###### ii. Implementing the Servlet Interface
+`````
+import javax.servlet.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class MyServlet implements Servlet {
+
+    private ServletConfig config;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        this.config = config;
+        System.out.println("Servlet initialized");
+    }
+
+    @Override
+    public ServletConfig getServletConfig() {
+        return config;
+    }
+
+    @Override
+    public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+ out.println("</body></html>");
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "MyServlet - a basic implementation of the Servlet interface";
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("Servlet destroyed");
+    }
+}
+
+`````
+
+###### iii. Extending HttpServlet
+`````
+import javax.servlet.http.*;
+import java.io.*;
+
+public class MyHttpServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+        out.println("Hello from HttpServlet!");
+    }
+}
+`````
+##### 6) What is a session?
+###### A session stores user data on the server temporarily, starting when the user logs in and ending when they log out or close the browser.
+##### 7) Session Management?
+###### By default, the HTTP protocol is stateless, i.e., we cannot remember the data from previous to previous transactions.
+###### To remember the data across all the transactions, we use the concept of a session.
+###### There are 3 ways to perform session tracking.
+###### i. Using a hidden field.
+`````
+// Java program to demonstrate
+// Hidden form field method
+
+package GeeksforGeeks;
+
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet; // Importing annotation
+import javax.servlet.http.*;
+
+// using this annotation we dont need
+// xml file for dispathing servlet
+@WebServlet("/SecondServlet")
+
+public class SecondServlet extends HttpServlet {
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+    {
+        try {
+            response.setContentType("text/html");
+            /*
+             The response's character encoding is only set from the given
+             content type if this method is called before getWriter is called.
+             This method may be called repeatedly to change content type and
+             character encoding.
+             */
+            PrintWriter out = response.getWriter();
+
+            /*
+             The Java PrintWriter class ( java.io.PrintWriter ) enables you to
+             write formatted data to an underlying Writer . For instance,
+             writing int, long and other primitive data formatted as text,
+             rather than as their byte values
+             */
+            // getting value from the query string
+            String username = request.getParameter("username");
+
+            // taking the value of username from First servlet using getparameter object
+            out.print("WELCOME " + username);
+
+            // out.println is used to print on the client web browser
+            out.close();
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+`````
+
+###### ii. Cookies
+###### A cookie is a key-value pair sent by the server to the client, which the browser stores and sends back with future requests to the same server.
+`````
+> Create a Cookie:
+Cookie cookie = new Cookie("username", "rahul");
+response.addCookie(cookie); // sends cookie to client
+
+> Read Cookies from Request:
+Cookie[] cookies = request.getCookies();
+if (cookies != null) {
+    for (Cookie c : cookies) {
+        if (c.getName().equals("username")) {
+            String user = c.getValue();
+        }
+    }
+}
+
+> Set Cookie Expiry:
+cookie.setMaxAge(60 * 60); // 1 hour
+
+> Delete a Cookie:
+cookie.setMaxAge(0); // deletes the cookie
+response.addCookie(cookie);
+
+`````
+###### types of cookies
+###### 1. Session Cookies
+###### Stored in: Browser memory (not saved to disk).
+###### Expires: When the browser is closed.
+###### Use case: Temporary data like login status during a single session.
+
+`````
+Cookie sessionCookie = new Cookie("sessionId", "abc123");
+// No expiry set → session cookie
+response.addCookie(sessionCookie);
+
+`````
+
+###### 2. Persistent Cookies
+###### Stored in: Disk (saved by the browser).
+###### Expires: After a specified time.
+###### Use case: Remembering user preferences, login info across sessions.
+
+`````
+Cookie persistentCookie = new Cookie("username", "rahul");
+persistentCookie.setMaxAge(60 * 60 * 24 * 7); // 7 days
+response.addCookie(persistentCookie);
+
+`````
+
+###### 3. Secure Cookies
+###### Sent only over: HTTPS connections.
+###### Use case: Sensitive data like authentication tokens.
+`````
+Cookie secureCookie = new Cookie("authToken", "xyz789");
+secureCookie.setSecure(true); // only sent over HTTPS
+response.addCookie(secureCookie);
+
+`````
+
+######  4. HttpOnly Cookies
+###### Accessible by: Server-side only (not JavaScript).
+###### Use case: Prevent XSS attacks by hiding cookies from client-side scripts.
+`````
+secureCookie.setHttpOnly(true); // not accessible via JavaScript
+
+`````
+
+###### 5. SameSite Cookies (Servlet 4.0+ or via headers)
+###### Controls: Cross-site request behavior.
+###### Values: Strict, Lax, or None.
+###### Use case: CSRF protection.
+`````
+// Not directly supported in older Servlet APIs; set via response header
+response.setHeader("Set-Cookie", "user=rahul; SameSite=Strict");
+
+`````
+
+###### Example
+###### servlet1
+`````
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class Servlet1 extends HttpServlet {
+
+    protected void
+    processRequest(HttpServletRequest request,
+                   HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet Servlet1</title>");
+            out.println("</head>");
+            out.println("<body>");
+
+            // Creating a string to store the name
+            String name = request.getParameter("name");
+            out.println("<h1> Hello, welcome to " + name
+                        + " </h1>");
+            out.println(
+                "<h1><a href =\"servlet2\">Go to Servlet2</a></h1>");
+            // Creating a cookie
+            Cookie c = new Cookie("user_name", name);
+            response.addCookie(c);
+
+            out.println("</body>");
+            out.println("</html>");
+        }
+    }
+}
+`````
+
+###### servlet 2
+`````
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class Servlet2 extends HttpServlet {
+
+    protected void
+    processRequest(HttpServletRequest request,
+                   HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet Servlet2</title>");
+            out.println("</head>");
+            out.println("<body>");
+
+            // Fetching cookies(if found more than one)
+            // Array of Cookies
+            Cookie[] cookies = request.getCookies();
+            boolean f = false;
+            String name = "";
+            if (cookies == null) {
+                out.println(
+                    "<h1>You are new user, go to home page and submit your institute's name");
+                return;
+            }
+            else {
+                for (Cookie c : cookies) {
+                    String tname = c.getName();
+                    if (tname.equals("user_name")) {
+                        f = true;
+                        name = c.getValue();
+                    }
+                }
+            }
+            if (f) {
+                out.println("<h1> Hello, welcome back "
+                            + name + " </h1>");
+                out.println("<h2>Thank you!!</h2>");
+            }
+            else {
+                out.println(
+                    "<h1>You are new user, go to home page and submit your institute's name");
+            }
+
+            out.println("</body>");
+            out.println("</html>");
+        }
+    }
+}
+`````
+###### iii. HttpSession
+###### Servlets use the HttpSession interface to manage sessions.
+`````
+> Session Creation:
+HttpSession session = request.getSession(); // creates a new session or returns existing one
+
+> Storing Data in Session:
+session.setAttribute("username", "rahul");
+
+> Retrieving Data from Session:
+String user = (String) session.getAttribute("username");
+
+> Invalidating a Session (e.g., on logout):
+session.invalidate();
+
+`````
+###### Example
+`````
+import javax.servlet.http.*;
+import javax.servlet.annotation.WebServlet;
+import java.io.*;
+
+@WebServlet("/sessionExample")
+public class SessionExampleServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HttpSession session = request.getSession();
+        session.setAttribute("user", "Rahul");
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("Session created. User: " + session.getAttribute("user"));
+    }
+}
+
+`````
+##### 8) Difference between Servlet and JSP
+
+| Feature      |Servlet         | JSP (JavaServer Pages) |
+|:-------------|:--------------:|-----------------------:|
+| Purpose      | Handles business logic and request processing| Handles presentation logic (HTML + Java) |
+| Code Type     | Pure Java code      | HTML with embedded Java code|
+| Compilation | Compiled into .class files manually or by server | Translated into a servlet by the server automatically|
+| Lifecycle    | Managed by servlet container | Converted to servlet, then managed similarly |
+| Best Use Case | Form handling, session management, backend logic | Displaying data, UI templates |
+
+
+##### 9) What is a Servlet Filter?
+###### In Servlets, a Filter is a reusable piece of code that can intercept and process requests and responses before they reach a servlet or after the servlet has processed them.
+###### Filters are part of the Java EE (Jakarta EE) specification and are commonly used for tasks like logging, authentication, input validation, and compression.
+
+###### Example
+###### javax.servlet.Filter
+`````
+public interface Filter {
+    void init(FilterConfig filterConfig) throws ServletException;
+    void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException;
+    void destroy();
+}
+
+`````
+
+###### Example: Logging Filter
+`````
+import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
+import java.io.IOException;
+
+@WebFilter("/hello") // applies to /hello servlet
+public class LoggingFilter implements Filter {
+
+    public void init(FilterConfig filterConfig) throws ServletException {
+        System.out.println("LoggingFilter initialized");
+    }
+
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        System.out.println("Request received at: " + new java.util.Date());
+        chain.doFilter(request, response); // pass request to next filter or servlet
+    }
+
+    public void destroy() {
+        System.out.println("LoggingFilter destroyed");
+    }
+}
+
+`````
+
+###### Common Use Cases
+`````
+Logging request details
+Authentication and authorization
+Input validation and sanitization
+Compression (e.g., GZIP)
+Setting response headers
+Caching control
+`````
+
+##### 9) Explain the web.xml file in a servlet?
+###### In a Servlet-based Java web application, the web.xml file (also called the deployment descriptor) is an XML configuration file located in the WEB-INF directory. It defines how servlets, filters, listeners, and other components are deployed and interact within the web application.
+
+######  Purpose of web.xml
+`````
+Configure servlets and their URL mappings
+Define filters and listeners
+Set initialization parameters
+Configure session timeout
+Handle error pages
+Define welcome files
+Control security settings
+`````
+###### Basic Structure of web.xml
+`````
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         version="3.1">
+
+    <!-- Servlet Declaration -->
+    <servlet>
+        <servlet-name>HelloServlet</servlet-name>
+        <servlet-class>com.example.HelloServlet</servlet-class>
+    </servlet>
+
+    <!-- Servlet Mapping -->
+    <servlet-mapping>
+        <servlet-name>HelloServlet</servlet-name>
+        <url-pattern>/hello</url-pattern>
+    </servlet-mapping>
+
+    <!-- Filter Declaration -->
+    <filter>
+        <filter-name>LoggingFilter</filter-name>
+        <filter-class>com.example.LoggingFilter</filter-class>
+    </filter>
+
+    <!-- Filter Mapping -->
+    <filter-mapping>
+        <filter-name>LoggingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Welcome File -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!-- Error Page -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error404.jsp</location>
+    </error-page>
+
+</web-app>
+
+`````
+
+###### Key Tags in web.xml
+`````
+> <servlet>           - Declares a servlet class
+> <servlet-mapping>   - Maps servlet to a URL pattern
+> <filter>            - Declares a filter class
+> <filter-mapping>    - Maps filter to a URL pattern
+> <welcome-file-list> - Defines default page when app is accessed
+> <error-page>        - Custom error handling
+> <context-param>     - Application-wide parameters
+> <session-config>    - Session timeout configuration
+`````
+
+###### Servlet 3.0+ Alternative
+###### In modern Java EE (Servlet 3.0+), you can use annotations like @WebServlet, @WebFilter, and @WebListener instead of web.xml.
+<img width="300" height="300" alt="webxml" src="https://github.com/user-attachments/assets/52b57b79-0854-4a1a-9e7e-8da977044ef0" />
+
+##### 10) Difference between ServletContext and ServletConfig
+
