@@ -836,3 +836,70 @@ public class JokeConsumerServlet extends HttpServlet {
 }
 
 `````
+
+#
+### JSP
+##### 1) What is JSP?
+###### JSP (JavaServer Pages) is a server-side technology used to create dynamic, platform-independent web content. It allows you to embed Java code directly into HTML pages, making it easier to build web applications that generate dynamic content.
+`````
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
+<html>
+<head><title>Hello JSP</title></head>
+<body>
+    <h1>Welcome to JSP!</h1>
+    <p>Current time: <%= new java.util.Date() %></p>
+</body>
+</html>
+
+`````
+
+##### 2) JSP Life Cycle?
+###### The JSP (JavaServer Pages) lifecycle describes the steps a JSP page goes through from creation to destruction. It’s similar to a servlet lifecycle because JSPs are ultimately compiled into servlets by the container.
+`````
+1. Translation Phase
+   The JSP file is translated into a servlet by the web container.
+   This happens only once, when the JSP is first requested or modified.
+2. Compilation Phase
+   The translated servlet (Java file) is compiled into a class file.
+   This compiled servlet is then loaded into memory.
+3. Initialization Phase
+   The container instantiates the servlet and calls its jspInit() method.
+   This is similar to the init() method in servlets.
+4. Request Processing Phase
+   For each client request, the container calls the service() method.
+   This is where the JSP executes and generates dynamic content.
+5. Destruction Phase
+   When the JSP is no longer needed or the server shuts down, the container calls jspDestroy() to clean up resources.
+`````
+###### 🔁 Lifecycle Summary
+|Phase	|Description|
+|:-------------|:--------------:|
+|Translation	|JSP → Servlet (Java code)|
+|Compilation	|Java code → Class file|
+|Initialization	|jspInit() called once|
+|Execution	|service() called for each request|
+|Destruction	|jspDestroy() called before unloading|
+
+`````
+<%@ page language="java" %>
+<%! 
+    public void jspInit() {
+        System.out.println("JSP Initialized");
+    }
+
+    public void jspDestroy() {
+        System.out.println("JSP Destroyed");
+    }
+%>
+
+<html>
+<body>
+    <h1>Hello from JSP!</h1>
+</body>
+</html>
+
+`````
+
+##### 
+
+
