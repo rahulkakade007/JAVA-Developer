@@ -646,7 +646,7 @@ Control security settings
 ###### Key Tags in web.xml
 `````
 > <servlet>           - Declares a servlet class
-> <servlet-mapping>   - Maps servlet to a URL pattern
+> <servlet-mapping>   - Maps a servlet to a URL pattern
 > <filter>            - Declares a filter class
 > <filter-mapping>    - Maps filter to a URL pattern
 > <welcome-file-list> - Defines default page when app is accessed
@@ -660,4 +660,179 @@ Control security settings
 <img width="300" height="300" alt="webxml" src="https://github.com/user-attachments/assets/52b57b79-0854-4a1a-9e7e-8da977044ef0" />
 
 ##### 10) Difference between ServletContext and ServletConfig
+###### ServletContext is an interface that provides a way for servlets to communicate with their servlet container and share information across the entire web application.
+`````
+public class MyServlet extends HttpServlet {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+        ServletContext context = getServletContext();
+        String appName = context.getInitParameter("applicationName");
+        context.log("Application Name: " + appName);
+    }
+}
 
+`````
+###### ServletConfig is an interface that provides configuration information to a specific servlet. It’s used to pass initialization parameters to a servlet and to give access to the ServletContext.
+`````
+package com.example;
+
+import java.io.IOException;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+public class WelcomeServlet extends HttpServlet {
+
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config); // Always call super.init(config)
+        String companyName = config.getInitParameter("companyName");
+        config.getServletContext().log("Company Name: " + companyName);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        ServletConfig config = getServletConfig();
+        String companyName = config.getInitParameter("companyName");
+
+        response.setContentType("text/html");
+        response.getWriter().println("<h1>Welcome to " + companyName + "</h1>");
+    }
+}
+
+`````
+| Feature      |ServletContext         | ServletConfig |
+|:-------------|:--------------:|-----------------------:|
+| Scope      | Entire web application| Specific servlet|
+|Initialization Parameters | Global (defined in <context-param>) | Local (defined in <init-param>) |
+| Data Sharing | Yes, across servlets | No, limited to one servlet |
+| Access Method | getServletContext() | getServletConfig() |
+
+##### 11) What is the difference between a forward and a redirect in Servlets?
+###### In Java Servlets, forward and redirect are two ways to transfer control from one resource (like a servlet or JSP) to another. Though they may seem similar, they behave quite differently.
+###### Forward
+`````
+✅ What It Does:
+Transfers the request internally within the server.
+The URL in the browser remains unchanged.
+The original request and response objects are passed along.
+📌 Use Case:
+When you want to pass control to another resource within the same application without notifying the client.
+`````
+`````
+RequestDispatcher dispatcher = request.getRequestDispatcher("nextPage.jsp");
+dispatcher.forward(request, response);
+
+`````
+###### Redirect
+`````
+✅ What It Does:
+Sends a new HTTP response to the client with a status code 302 (Found).
+The client's browser makes a new request to the new URL.
+The URL in the browser changes.
+📌 Use Case:
+When you want to redirect the user to a different application, external site, or after form submission to prevent resubmission.
+`````
+`````
+response.sendRedirect("nextPage.jsp");
+
+`````
+| Feature      |forward()         | sendRedirect() |
+|:-------------|:--------------:|-----------------------:|
+| Type of transfer      | Internal (server-side) | External (client-side) |
+| Browser URL changes | ❌ No | ✅ Yes |
+| Request object | ✅ Preserved | ❌ New request |
+| Performance | ✅ Faster (no extra round-trip) | ❌ Slower (extra HTTP request) |
+| Use case | Internal navigation | External navigation or post-redirect-get |
+
+##### 12) Custom error pages?
+###### In Java Servlets, you can define custom error pages to handle specific HTTP errors or exceptions gracefully, instead of showing the default server error messages.
+###### You define custom error pages in the web.xml deployment descriptor of your web application.
+###### ✅ 1. Handling HTTP Error Codes : You can map specific HTTP status codes (like 404 or 500) to custom JSP or HTML pages.
+`````
+<error-page>
+    <error-code>404</error-code>
+    <location>/errors/404.jsp</location>
+</error-page>
+
+<error-page>
+    <error-code>500</error-code>
+    <location>/errors/500.jsp</location>
+</error-page>
+
+`````
+
+###### ✅ 2. Handling Java Exceptions : You can also map specific Java exceptions to custom error pages
+`````
+<error-page>
+    <exception-type>java.lang.NullPointerException</exception-type>
+    <location>/errors/nullPointer.jsp</location>
+</error-page>
+
+<error-page>
+    <exception-type>java.lang.Throwable</exception-type>
+    <location>/errors/generalError.jsp</location>
+</error-page>
+
+`````
+###### Example: 404.jsp
+`````
+<%@ page isErrorPage="true" %>
+<html>
+<head><title>Page Not Found</title></head>
+<body>
+    <h1>Oops! Page not found (404)</h1>
+    <p>The page you are looking for might have been removed or is temporarily unavailable.</p>
+</body>
+</html>
+
+`````
+
+##### 13) Write a Servlet that consumes a RESTful web service and displays the response.
+###### Servlet Code Example: Let’s say we want to consume a REST API that returns a random joke in JSON format, like:
+###### API Endpoint: https://official-joke-api.appspot.com/random_joke
+`````
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/consumeJoke")
+public class JokeConsumerServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, Httpoke-api.appspot.com/random_joke";
+        URL url = new URL(apiUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder jsonResponse = new StringBuilder();
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            jsonResponse.append(line);
+        }
+        reader.close();
+
+        // Set response type and display the JSON
+        response.setContentType("application/json");
+        response.getWriter().println(jsonResponse.toString());
+    }
+}
+
+`````
+
+###### Output: When you access /consumeJoke, the servlet will fetch a joke from the API and display something like:
+`````
+{
+  "id": 123,
+  "type": "general",
+  "setup": "Why don't scientists trust atoms?",
+  "punchline": "Because they make up everything!"
+}
+
+`````
